@@ -7,6 +7,8 @@ import {
   Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import { useNavigation } from '@react-navigation/native';
+
 import {
   Container,
   Title,
@@ -22,6 +24,7 @@ import Button from '../../components/Button';
 import logoImg from '../../assets/logo.png';
 
 const SignIn: React.FC = () => {
+  const navigation = useNavigation();
   return (
     <>
       <KeyboardAvoidingView
@@ -58,7 +61,7 @@ const SignIn: React.FC = () => {
           </Container>
         </ScrollView>
 
-        <CreateAccountButton onPress={() => {}}>
+        <CreateAccountButton onPress={() => navigation.navigate('SignOut')}>
           <Icon name="log-in" size={20} color="#ff9000" />
           <CreateAccountButtonTextCriar>
             Criar uma conta
