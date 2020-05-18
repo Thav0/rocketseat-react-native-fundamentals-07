@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import {
   Image,
@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
+import { Form } from '@unform/mobile';
+import { FormHandles } from '@unform/core';
 import {
   Container,
   Title,
@@ -22,6 +24,8 @@ import logoImg from '../../assets/logo.png';
 
 const SignOut: React.FC = () => {
   const navigation = useNavigation();
+  const formRef = useRef<FormHandles>(null);
+
   return (
     <>
       <KeyboardAvoidingView
@@ -37,17 +41,32 @@ const SignOut: React.FC = () => {
             <Image source={logoImg} />
             <Title>Criar conta</Title>
 
-            <Input name="nome" icon="user" placeholder="Nome" />
-            <Input name="email" icon="mail" placeholder="E-mail" />
-            <Input name="password" icon="lock" placeholder="Password" />
+            <Form ref={formRef} onSubmit={(data) => console.log(data)}>
+              <Input
+                autoCapitalize="words"
+                name="nome"
+                icon="user"
+                placeholder="Nome"
+              />
+              <Input
+                keyboardType="email-address"
+                autoCorrect={false}
+                autoCapitalize="none"
+                name="email"
+                icon="mail"
+                placeholder="E-mail"
+              />
+              <Input
+                secureTextEntry
+                name="password"
+                icon="lock"
+                placeholder="Password"
+              />
 
-            <Button
-              onPress={() => {
-                console.log('test');
-              }}
-            >
-              Entrar
-            </Button>
+              <Button onPress={() => formRef.current?.submitForm}>
+                Entrar
+              </Button>
+            </Form>
           </Container>
         </ScrollView>
 
