@@ -14,6 +14,7 @@ import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
 import getValidationErrors from '../../utils/getValidationErrors';
+import api from '../../services/apiClient';
 import {
   Container,
   Title,
@@ -54,7 +55,12 @@ const SignOut: React.FC = () => {
         abortEarly: false,
       });
 
-      Alert.alert('Cadastro realizado com sucesso!', 'Poderá efetuar o logo');
+      await api.post('/users', data);
+      Alert.alert(
+        'Cadastro realizado com sucesso!',
+        'Podera fazer login na aplicação'
+      );
+      navigation.goBack();
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const getErrors = getValidationErrors(err);
@@ -62,7 +68,7 @@ const SignOut: React.FC = () => {
         formRef.current?.setErrors(getErrors);
         return;
       }
-
+      console.log(err);
       Alert.alert('Falha no cadastro', 'Os dados inseridos estão inválidos');
     }
   }, []);
@@ -85,7 +91,7 @@ const SignOut: React.FC = () => {
             <Form ref={formRef} onSubmit={handleSignUp}>
               <Input
                 autoCapitalize="words"
-                name="nome"
+                name="name"
                 icon="user"
                 placeholder="Nome"
                 returnKeyType="next"
@@ -114,10 +120,10 @@ const SignOut: React.FC = () => {
                 placeholder="Password"
                 textContentType="newPassword"
                 returnKeyType="send"
-                onSubmitEditing={() => formRef.current?.submitForm}
+                onSubmitEditing={() => formRef.current?.submitForm()}
               />
 
-              <Button onPress={() => formRef.current?.submitForm}>
+              <Button onPress={() => formRef.current?.submitForm()}>
                 Cadastrar
               </Button>
             </Form>
