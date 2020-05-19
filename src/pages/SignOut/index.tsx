@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useCallback } from 'react';
 
 import {
   Image,
@@ -6,11 +6,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
+import getValidationErrors from '../../utils/getValidationErrors';
 import {
   Container,
   Title,
@@ -23,12 +26,46 @@ import Button from '../../components/Button';
 
 import logoImg from '../../assets/logo.png';
 
+interface SignUpFormData {
+  name: string;
+  email: string;
+  password: string;
+}
+
 const SignOut: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const navigation = useNavigation();
 
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
+
+  const handleSignUp = useCallback(async (data: SignUpFormData) => {
+    try {
+      formRef.current?.setErrors({});
+      const schema = Yup.object().shape({
+        name: Yup.string().required('Nome obrigatório'),
+        email: Yup.string()
+          .email('Digite um email valido')
+          .required('E-mail obrigatório'),
+        password: Yup.string().min(6, 'Minimo 6 caracteres'),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+
+      Alert.alert('Cadastro realizado com sucesso!', 'Poderá efetuar o logo');
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const getErrors = getValidationErrors(err);
+
+        formRef.current?.setErrors(getErrors);
+        return;
+      }
+
+      Alert.alert('Falha no cadastro', 'Os dados inseridos estão inválidos');
+    }
+  }, []);
 
   return (
     <>
@@ -45,7 +82,7 @@ const SignOut: React.FC = () => {
             <Image source={logoImg} />
             <Title>Criar conta</Title>
 
-            <Form ref={formRef} onSubmit={(data) => console.log(data)}>
+            <Form ref={formRef} onSubmit={handleSignUp}>
               <Input
                 autoCapitalize="words"
                 name="nome"
@@ -81,7 +118,7 @@ const SignOut: React.FC = () => {
               />
 
               <Button onPress={() => formRef.current?.submitForm}>
-                Entrar
+                Cadastrar
               </Button>
             </Form>
           </Container>
